@@ -17,8 +17,7 @@ class PlayListFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         Log.d("PlayListFragment", "OnCreateView")
-        val rootView = inflater.inflate(R.layout.fragment_player, container, false)
-        rootView.section_label.text = getString(R.string.section_format, " playlist")
+        val rootView = inflater.inflate(R.layout.playlist_fragment, container, false)
         return rootView
     }
 

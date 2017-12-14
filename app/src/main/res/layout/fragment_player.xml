@@ -1,22 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/constraintLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/section_label"
-        android:layout_width="wrap_content"
+    <ImageView
+        android:layout_marginTop="55dp"
+        android:id="@+id/artist_image"
+        android:layout_width="match_parent"
+        android:layout_height="350dp"
+        android:src="@drawable/ic_launcher_background"
+        tools:ignore="ContentDescription" />
+    <LinearLayout
+        app:layout_constraintTop_toBottomOf="@+id/artist_image"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/activity_vertical_margin"
-        android:layout_marginEnd="@dimen/activity_horizontal_margin"
-        android:layout_marginStart="@dimen/activity_horizontal_margin"
-        android:layout_marginTop="@dimen/activity_vertical_margin"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/constraintLayout"
-        tools:layout_constraintLeft_creator="1"
-        tools:layout_constraintTop_creator="1" />
+        android:gravity="center_horizontal"
+        android:orientation="vertical">
+        <SeekBar
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="15dp"
+            android:layout_marginLeft="25dp"
+            android:layout_marginRight="25dp"/>
+        <LinearLayout
+            android:layout_marginTop="25dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+        <ImageButton
+            android:id="@+id/button_prev"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@android:drawable/ic_media_previous"/>
+        <ImageButton
+            android:id="@+id/button_pause"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@android:drawable/ic_media_pause"/>
+        <ImageButton
+            android:id="@+id/button_play"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@android:drawable/ic_media_play"/>
+        <ImageButton
+            android:id="@+id/button_next"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@android:drawable/ic_media_next"/>
+        </LinearLayout>
+    </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>

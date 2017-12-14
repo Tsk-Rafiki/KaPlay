@@ -29,7 +29,7 @@ class PlayerFragment : Fragment() {
                 .subscribeOn(Schedulers.io())
                 .subscribe({
                     result -> Log.d("myLog", result.toString())
-                    rootView.section_label.text = result.track?.wiki?.content
+
                     }
                     , {
                         error -> error.printStackTrace()

@@ -1,8 +1,11 @@
 package ru.rafiki.KaPlay.Screens.main_activity
 
+import android.Manifest
 import android.content.*
+import android.content.pm.PackageManager
 import android.database.Cursor
 import android.net.Uri
+import android.os.Build
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 
@@ -87,6 +90,7 @@ class MainActivity : AppCompatActivity() {
         val uri: Uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
         val selection: String = MediaStore.Audio.Media.IS_MUSIC + "!= 0"
         val sortOrder: String = MediaStore.Audio.Media.TITLE + " ASC"
+        checkReadExternalPermissions()
         val cursor: Cursor = contentResolver.query(uri, null, selection, null, sortOrder)
         if (cursor.count > 0) {
             audioList = ArrayList()
@@ -100,6 +104,18 @@ class MainActivity : AppCompatActivity() {
         }
         cursor.close()
 
+    }
+
+    private fun checkReadExternalPermissions() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                if (shouldShowRequestPermissionRationale(Manifest.permission.READ_EXTERNAL_STORAGE)) {
+                }
+
+            }
+            val MY_PERMISSIONS_REQUEST_READ_CONTACTS = 1100
+            requestPermissions(arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), MY_PERMISSIONS_REQUEST_READ_CONTACTS)
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
