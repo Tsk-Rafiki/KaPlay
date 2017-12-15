@@ -3,6 +3,7 @@ package ru.rafiki.KaPlay.repository
 import android.content.Context
 import android.content.SharedPreferences
 import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import ru.rafiki.KaPlay.network.model.Audio
 
 /**
@@ -25,7 +26,7 @@ class StorageUtil(val context: Context) {
         preference = context.getSharedPreferences(STORAGE, Context.MODE_PRIVATE)
         val gson = Gson()
         val json: String? = preference.getString("audioArrayList", null)
-        return gson.fromJson(json, ArrayList<Audio>()::class.java)
+        return gson.fromJson(json, object : TypeToken<ArrayList<Audio>>(){}.type)
     }
 
     public fun storeAudioIndex(index: Int) {

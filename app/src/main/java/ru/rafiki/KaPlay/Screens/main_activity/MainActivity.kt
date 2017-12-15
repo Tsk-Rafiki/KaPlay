@@ -12,6 +12,7 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.os.IBinder
 import android.provider.MediaStore
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
@@ -21,6 +22,7 @@ import ru.rafiki.KaPlay.R
 import ru.rafiki.KaPlay.Screens.main_activity.fragment_adapter.SectionsPagerAdapter
 import ru.rafiki.KaPlay.network.model.Audio
 import ru.rafiki.KaPlay.repository.StorageUtil
+import ru.rafiki.KaPlay.services.kaudio_media_service.AudioRepository
 import ru.rafiki.KaPlay.services.kaudio_media_service.KAudioMusicService
 
 class MainActivity : AppCompatActivity() {
@@ -30,7 +32,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     lateinit var player: KAudioMusicService
-    lateinit var audioList: ArrayList<Audio>
+    lateinit var audioRepository: AudioRepository
 
     var isServiceBound = false
     lateinit private var serviceConnection: ServiceConnection
@@ -51,7 +53,7 @@ class MainActivity : AppCompatActivity() {
             Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                     .setAction("Action", null).show()
         }
-
+        checkReadExternalPermissions()
         serviceConnection = object : ServiceConnection {
             override fun onServiceDisconnected(name: ComponentName?) {
                 isServiceBound = false
@@ -64,55 +66,59 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(this@MainActivity, "Service bound", Toast.LENGTH_SHORT).show()
             }
         }
-        loadAudio()
+//        audioRepository = AudioRepository
+//        audioRepository.loadAudio(applicationContext)
     }
 
-    private fun playAudio(audioIndex: Int) {
-        if (!isServiceBound) {
-            val storage: StorageUtil = StorageUtil(applicationContext)
-            storage.storeAudio(audioList)
-            storage.storeAudioIndex(audioIndex)
-
-            val playerIntent: Intent = Intent(this, KAudioMusicService::class.java)
-            startService(playerIntent)
-            bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
-        } else {
-            val storage: StorageUtil = StorageUtil(applicationContext)
-            storage.storeAudioIndex(audioIndex)
-            val broadcastIntent: Intent = Intent(Broadcast_PLAY_NEW_AUDIO)
-            sendBroadcast(broadcastIntent)
-        }
-    }
-
-    private fun loadAudio() {
-        val contentResolver: ContentResolver = contentResolver
-
-        val uri: Uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
-        val selection: String = MediaStore.Audio.Media.IS_MUSIC + "!= 0"
-        val sortOrder: String = MediaStore.Audio.Media.TITLE + " ASC"
-        checkReadExternalPermissions()
-        val cursor: Cursor = contentResolver.query(uri, null, selection, null, sortOrder)
-        if (cursor.count > 0) {
-            audioList = ArrayList()
-            while (cursor.moveToNext()) {
-                val data: String = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA))
-                val title: String = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE))
-                val album: String = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM))
-                val artist: String = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST))
-                audioList.add(Audio(data, title, album, artist))
-            }
-        }
-        cursor.close()
-
-    }
+//      private fun playAudio(audioIndex: Int) {
+//        if (!isServiceBound) {
+//            val storage: StorageUtil = StorageUtil(applicationContext)
+//            storage.storeAudio(audioList)
+//            storage.storeAudioIndex(audioIndex)
+//
+//            val playerIntent: Intent = Intent(this, KAudioMusicService::class.java)
+//            startService(playerIntent)
+//            bindService(playerIntent, serviceConnection, Context.BIND_AUTO_CREATE)
+//        } else {
+//            val storage: StorageUtil = StorageUtil(applicationContext)
+//            storage.storeAudioIndex(audioIndex)
+//            val broadcastIntent: Intent = Intent(Broadcast_PLAY_NEW_AUDIO)
+//            sendBroadcast(broadcastIntent)
+//        }
+//    }
+//
+//    private fun loadAudio() {
+//        val contentResolver: ContentResolver = contentResolver
+//
+//        val uri: Uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
+//        val selection: String = MediaStore.Audio.Media.IS_MUSIC + "!= 0"
+//        val sortOrder: String = MediaStore.Audio.Media.TITLE + " ASC"
+//        checkReadExternalPermissions()
+//        val cursor: Cursor = contentResolver.query(uri, null, selection, null, sortOrder)
+//        if (cursor.count > 0) {
+//            audioList = ArrayList()
+//            while (cursor.moveToNext()) {
+//                val data: String = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA))
+//                val title: String = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE))
+//                val album: String = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM))
+//                val artist: String = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST))
+//                audioList.add(Audio(data, title, album, artist))
+//            }
+//        }
+//        cursor.close()
+//
+//    }
 
     private fun checkReadExternalPermissions() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                 if (shouldShowRequestPermissionRationale(Manifest.permission.READ_EXTERNAL_STORAGE)) {
                 }
-
             }
+            audioRepository = AudioRepository
+            audioRepository.loadAudio(applicationContext)
+            Log.d("myLog", "Play list size: ${audioRepository.audioList.size}")
+
             val MY_PERMISSIONS_REQUEST_READ_CONTACTS = 1100
             requestPermissions(arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), MY_PERMISSIONS_REQUEST_READ_CONTACTS)
         }

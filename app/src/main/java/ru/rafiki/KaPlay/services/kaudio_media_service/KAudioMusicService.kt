@@ -44,14 +44,13 @@ class KAudioMusicService : Service(),
         AudioManager.OnAudioFocusChangeListener{
 
     private var mediaPlayer: MediaPlayer
-    lateinit private var mediaFile: String
     lateinit private var audioManager: AudioManager
-    lateinit private var becomingNoisyReceiver: BroadcastReceiver
+    private var becomingNoisyReceiver: BroadcastReceiver
     lateinit private var phoneStateListener: PhoneStateListener
     lateinit private var telephonyManager: TelephonyManager
     lateinit private var audioList: ArrayList<Audio>
     lateinit private var activeAudio: Audio
-    lateinit private var playNewAudio: BroadcastReceiver
+    private var playNewAudio: BroadcastReceiver
     lateinit var mediaSession: MediaSessionCompat
     lateinit var transportControls: MediaControllerCompat.TransportControls
     var mediaSessionManager: MediaSessionManager? = null
@@ -110,7 +109,6 @@ class KAudioMusicService : Service(),
     private fun initMediaPlayer() {
         mediaPlayer = MediaPlayer()
         with(mediaPlayer) {
-            setOnCompletionListener(this@KAudioMusicService)
             setOnCompletionListener(this@KAudioMusicService)
             setOnErrorListener(this@KAudioMusicService)
             setOnPreparedListener(this@KAudioMusicService)
@@ -178,7 +176,7 @@ class KAudioMusicService : Service(),
     }
 
     private fun updateMetaData() {
-        var albumArt: Bitmap = BitmapFactory.decodeResource(resources, R.drawable.abc_ic_search_api_material)
+        val albumArt: Bitmap = BitmapFactory.decodeResource(resources, R.drawable.abc_ab_share_pack_mtrl_alpha)
         mediaSession.setMetadata(MediaMetadataCompat.Builder()
                 .putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, albumArt)
                 .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, activeAudio.artist)
@@ -225,7 +223,7 @@ class KAudioMusicService : Service(),
             notificationAction = android.R.drawable.ic_media_play
             playPauseAction = playbackAction(0)
         }
-        val largeIcon: Bitmap = BitmapFactory.decodeResource(resources, R.drawable.ic_launcher_background)
+        val largeIcon: Bitmap = BitmapFactory.decodeResource(resources, android.R.drawable.ic_dialog_info)
         val notificationBuilder: NotificationCompat.Builder = NotificationCompat.Builder(this)
                 .setShowWhen(false)
                 .setStyle(MediaStyle()
@@ -346,7 +344,7 @@ class KAudioMusicService : Service(),
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
 
         try {
-            val storage: StorageUtil = StorageUtil(applicationContext)
+            val storage = StorageUtil(applicationContext)
             audioList = storage.loadAudio()
             audioIndex = storage.loadAudioIndex()
 
@@ -356,6 +354,7 @@ class KAudioMusicService : Service(),
                 stopSelf()
             }
         } catch (e: NullPointerException) {
+            e.printStackTrace()
             stopSelf()
         }
 
@@ -379,7 +378,7 @@ class KAudioMusicService : Service(),
     }
 
     private fun register_playNewAudio() {
-        val filter: IntentFilter = IntentFilter(MainActivity.Broadcast_PLAY_NEW_AUDIO)
+        val filter = IntentFilter(MainActivity.Broadcast_PLAY_NEW_AUDIO)
         registerReceiver(playNewAudio, filter)
     }
 
