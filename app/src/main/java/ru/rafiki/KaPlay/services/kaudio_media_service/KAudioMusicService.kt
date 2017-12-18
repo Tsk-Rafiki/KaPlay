@@ -81,7 +81,7 @@ class KAudioMusicService : Service(),
             override fun onReceive(context: Context?, intent: Intent?) {
                 audioIndex = StorageUtil(applicationContext).loadAudioIndex()
                 if (audioIndex != -1 && audioIndex < audioList.size) {
-                    activeAudio = audioList.get(audioIndex)
+                    activeAudio = audioList[audioIndex]
                 } else {
                     stopSelf()
                 }
@@ -103,7 +103,7 @@ class KAudioMusicService : Service(),
         super.onCreate()
         callStateListener()
         registerBecomingNoisyReceiver()
-        register_playNewAudio()
+        registerLocalReceiver()
     }
 
     private fun initMediaPlayer() {
@@ -377,8 +377,15 @@ class KAudioMusicService : Service(),
         return super.onStartCommand(intent, flags, startId)
     }
 
-    private fun register_playNewAudio() {
-        val filter = IntentFilter(MainActivity.Broadcast_PLAY_NEW_AUDIO)
+    private fun registerLocalReceiver() {
+        val filter = IntentFilter()
+        with(filter) {
+            addAction(MainActivity.Broadcast_PLAY_AUDIO)
+            addAction(MainActivity.Broadcast_STOP_AUDIO)
+            addAction(MainActivity.Broadcast_NEXT_AUDIO)
+            addAction(MainActivity.Broadcast_PREV_AUDIO)
+            addAction(MainActivity.Broadcast_SEEK_TO_AUDIO)
+        }
         registerReceiver(playNewAudio, filter)
     }
 

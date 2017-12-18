@@ -82,6 +82,8 @@ class PlayerFragment : Fragment(), View.OnClickListener{
     }
 
     private fun ButtonNextClicked() {
+        val broadcastIntent = Intent(MainActivity.Broadcast_NEXT_AUDIO)
+        activity.sendBroadcast(broadcastIntent)
     }
 
     private fun ButtonPauseClicked() {
@@ -105,7 +107,8 @@ class PlayerFragment : Fragment(), View.OnClickListener{
     }
 
     private fun ButtonPrevClicked() {
-
+        val broadcastIntent = Intent(MainActivity.Broadcast_PREV_AUDIO)
+        activity.sendBroadcast(broadcastIntent)
     }
 
     companion object {
@@ -123,13 +126,13 @@ class PlayerFragment : Fragment(), View.OnClickListener{
         } else {
             val storage = StorageUtil(context)
             storage.storeAudioIndex(audioIndex)
-            val broadcastIntent = Intent(MainActivity.Broadcast_PLAY_NEW_AUDIO)
+            val broadcastIntent = Intent(MainActivity.Broadcast_PLAY_AUDIO)
             activity.sendBroadcast(broadcastIntent)
         }
     }
 
     private fun stopAudio() {
-        val broadcastIntent = Intent(MainActivity.Broadcast_PLAY_NEW_AUDIO)
+        val broadcastIntent = Intent(MainActivity.Broadcast_STOP_AUDIO)
         activity.sendBroadcast(broadcastIntent)
     }
 

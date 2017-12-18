@@ -15,20 +15,23 @@ import android.provider.MediaStore
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.Toast
 
 import kotlinx.android.synthetic.main.activity_main.*
 import ru.rafiki.KaPlay.R
 import ru.rafiki.KaPlay.Screens.main_activity.fragment_adapter.SectionsPagerAdapter
-import ru.rafiki.KaPlay.network.model.Audio
-import ru.rafiki.KaPlay.repository.StorageUtil
 import ru.rafiki.KaPlay.services.kaudio_media_service.AudioRepository
 import ru.rafiki.KaPlay.services.kaudio_media_service.KAudioMusicService
 
 class MainActivity : AppCompatActivity() {
 
     companion object {
-        val Broadcast_PLAY_NEW_AUDIO: String = "ru.sdn.audiotestkotlin.PlayNewAudio"
+        val Broadcast_PLAY_AUDIO: String = "ru.sdn.audiotestkotlin.PlayAudio"
+        val Broadcast_STOP_AUDIO: String = "ru.sdn.audiotestkotlin.StopAudio"
+        val Broadcast_NEXT_AUDIO: String = "ru.sdn.audiotestkotlin.NextAudio"
+        val Broadcast_PREV_AUDIO: String = "ru.sdn.audiotestkotlin.PrevAudio"
+        val Broadcast_SEEK_TO_AUDIO: String = "ru.sdn.audiotestkotlin.SeekToAudio"
     }
 
     lateinit var player: KAudioMusicService
@@ -113,14 +116,22 @@ class MainActivity : AppCompatActivity() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                 if (shouldShowRequestPermissionRationale(Manifest.permission.READ_EXTERNAL_STORAGE)) {
+                    Toast.makeText( this,"Storage permission is needed to load music files", Toast.LENGTH_SHORT).show()
+                } else {
+                    val MY_PERMISSIONS_REQUEST_READ_CONTACTS = 1100
+                    requestPermissions(arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), MY_PERMISSIONS_REQUEST_READ_CONTACTS)
                 }
+            } else {
+                audioRepository = AudioRepository
+                audioRepository.loadAudio(applicationContext)
+                Log.d("myLog", "checkReadExternalPermissions() SDK.ver >= 23")
+                Log.d("myLog", "Play list size: ${audioRepository.audioList.size}")
             }
+        } else {
             audioRepository = AudioRepository
             audioRepository.loadAudio(applicationContext)
+            Log.d("myLog", "checkReadExternalPermissions() SDK.ver < 23")
             Log.d("myLog", "Play list size: ${audioRepository.audioList.size}")
-
-            val MY_PERMISSIONS_REQUEST_READ_CONTACTS = 1100
-            requestPermissions(arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), MY_PERMISSIONS_REQUEST_READ_CONTACTS)
         }
     }
 
