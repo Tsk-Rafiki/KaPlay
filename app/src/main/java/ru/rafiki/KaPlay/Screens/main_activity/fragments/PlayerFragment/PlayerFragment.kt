@@ -51,7 +51,7 @@ class PlayerFragment : Fragment(), View.OnClickListener{
                 })
 
         rootView.button_next.setOnClickListener(this)
-        rootView.button_pause.setOnClickListener(this)
+        rootView.button_stop.setOnClickListener(this)
         rootView.button_play.setOnClickListener(this)
         rootView.button_prev.setOnClickListener(this)
 
@@ -74,7 +74,7 @@ class PlayerFragment : Fragment(), View.OnClickListener{
         if (v != null)
         when (v.id) {
             R.id.button_next -> ButtonNextClicked()
-            R.id.button_pause -> ButtonPauseClicked()
+            R.id.button_stop -> ButtonPauseClicked()
             R.id.button_play -> ButtonPlayClicked()
             R.id.button_prev -> ButtonPrevClicked()
         }

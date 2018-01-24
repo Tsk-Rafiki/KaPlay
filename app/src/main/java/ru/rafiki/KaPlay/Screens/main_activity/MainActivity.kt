@@ -32,12 +32,14 @@ class MainActivity : AppCompatActivity() {
         val Broadcast_NEXT_AUDIO: String = "ru.sdn.audiotestkotlin.NextAudio"
         val Broadcast_PREV_AUDIO: String = "ru.sdn.audiotestkotlin.PrevAudio"
         val Broadcast_SEEK_TO_AUDIO: String = "ru.sdn.audiotestkotlin.SeekToAudio"
+        val Broadcast_DESTROY_SERVICE: String = "ru.sdn.audiotestkotlin.SeekToAudio"
     }
 
     lateinit var player: KAudioMusicService
     lateinit var audioRepository: AudioRepository
 
     var isServiceBound = false
+    var isPlayerDisabled = false
     lateinit private var serviceConnection: ServiceConnection
 
     enum class fragmentType { player, playlist, settings}
@@ -52,10 +54,10 @@ class MainActivity : AppCompatActivity() {
 
         container.adapter = mSectionsPagerAdapter
 
-        fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show()
-        }
+//        fab.setOnClickListener { view ->
+//            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+//                    .setAction("Action", null).show()
+//        }
         checkReadExternalPermissions()
         serviceConnection = object : ServiceConnection {
             override fun onServiceDisconnected(name: ComponentName?) {
@@ -73,44 +75,6 @@ class MainActivity : AppCompatActivity() {
 //        audioRepository.loadAudio(applicationContext)
     }
 
-//      private fun playAudio(audioIndex: Int) {
-//        if (!isServiceBound) {
-//            val storage: StorageUtil = StorageUtil(applicationContext)
-//            storage.storeAudio(audioList)
-//            storage.storeAudioIndex(audioIndex)
-//
-//            val playerIntent: Intent = Intent(this, KAudioMusicService::class.java)
-//            startService(playerIntent)
-//            bindService(playerIntent, serviceConnection, Context.BIND_AUTO_CREATE)
-//        } else {
-//            val storage: StorageUtil = StorageUtil(applicationContext)
-//            storage.storeAudioIndex(audioIndex)
-//            val broadcastIntent: Intent = Intent(Broadcast_PLAY_NEW_AUDIO)
-//            sendBroadcast(broadcastIntent)
-//        }
-//    }
-//
-//    private fun loadAudio() {
-//        val contentResolver: ContentResolver = contentResolver
-//
-//        val uri: Uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
-//        val selection: String = MediaStore.Audio.Media.IS_MUSIC + "!= 0"
-//        val sortOrder: String = MediaStore.Audio.Media.TITLE + " ASC"
-//        checkReadExternalPermissions()
-//        val cursor: Cursor = contentResolver.query(uri, null, selection, null, sortOrder)
-//        if (cursor.count > 0) {
-//            audioList = ArrayList()
-//            while (cursor.moveToNext()) {
-//                val data: String = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA))
-//                val title: String = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE))
-//                val album: String = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM))
-//                val artist: String = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST))
-//                audioList.add(Audio(data, title, album, artist))
-//            }
-//        }
-//        cursor.close()
-//
-//    }
 
     private fun checkReadExternalPermissions() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -123,7 +87,11 @@ class MainActivity : AppCompatActivity() {
                 }
             } else {
                 audioRepository = AudioRepository
-                audioRepository.loadAudio(applicationContext)
+                if (!audioRepository.loadAudio(applicationContext)) {
+                    isPlayerDisabled = true
+                    Toast.makeText(this, "Music not found!", Toast.LENGTH_SHORT).show()
+                    Log.d("myLog", "Music not found!")
+                }
                 Log.d("myLog", "checkReadExternalPermissions() SDK.ver >= 23")
                 Log.d("myLog", "Play list size: ${audioRepository.audioList.size}")
             }
@@ -139,6 +107,11 @@ class MainActivity : AppCompatActivity() {
         // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.menu_main, menu)
         return true
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

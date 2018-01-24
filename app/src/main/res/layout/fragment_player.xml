@@ -37,16 +37,17 @@
             android:layout_height="wrap_content"
             android:src="@android:drawable/ic_media_previous"/>
         <ImageButton
-            android:id="@+id/button_pause"
+            android:id="@+id/button_stop"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@android:drawable/ic_media_pause"/>
-        <ImageButton
-            android:id="@+id/button_play"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:clickable="true"
-            android:src="@android:drawable/ic_media_play"/>
+
+            <ImageButton
+                android:id="@+id/button_play"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:src="@android:drawable/ic_media_play" />
         <ImageButton
             android:id="@+id/button_next"
             android:layout_width="wrap_content"

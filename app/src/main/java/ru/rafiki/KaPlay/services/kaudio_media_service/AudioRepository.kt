@@ -17,7 +17,7 @@ object AudioRepository{
     init {
         audioList = ArrayList()
     }
-    fun loadAudio(context: Context) {
+    fun loadAudio(context: Context) : Boolean {
         val contentResolver: ContentResolver = context.contentResolver
 
         val uri: Uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
@@ -33,8 +33,10 @@ object AudioRepository{
                 val length: String = (cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media.DURATION)) / 1000).toString()
                 audioList.add(Audio(data, title, album, artist, length))
             }
-        }
+        } else
+            return false
         cursor.close()
+        return true
     }
 
     fun storeDataAndIndex(context: Context, audioIndex: Int) {

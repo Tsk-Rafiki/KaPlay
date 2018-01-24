@@ -65,6 +65,7 @@ class KAudioMusicService : Service(),
         var ACTION_PREVIOUS: String = "ru.sdn.audiotestkotlin.ACTION_PREVIOUS"
         var ACTION_NEXT: String = "ru.sdn.audiotestkotlin.ACTION_NEXT"
         var ACTION_STOP: String = "ru.sdn.audiotestkotlin.ACTION_STOP"
+        var ACTION_CLOSE: String = "ru.sdn.audiotestkotlin.CLOSE_SERVICE"
         var NOTIFICATION_ID: Int = 101
     }
 
@@ -119,7 +120,8 @@ class KAudioMusicService : Service(),
             setAudioStreamType(AudioManager.STREAM_MUSIC)
         }
         try {
-            mediaPlayer.setDataSource(activeAudio.data)
+            if (activeAudio != null)
+                mediaPlayer.setDataSource(activeAudio.data)
         } catch (e: IOException) {
             e.printStackTrace()
             stopSelf()
@@ -231,6 +233,7 @@ class KAudioMusicService : Service(),
                         .setShowActionsInCompactView(0, 1, 2))
                 .setColor(resources.getColor(R.color.colorPrimary))
                 .setLargeIcon(largeIcon)
+                .setOngoing(true)
                 .setSmallIcon(android.R.drawable.stat_sys_headset)
                 .setContentText(activeAudio.artist)
                 .setContentTitle(activeAudio.album)
@@ -238,6 +241,7 @@ class KAudioMusicService : Service(),
                 .addAction(android.R.drawable.ic_media_previous, "previous", playbackAction(3))
                 .addAction(notificationAction, "pause", playPauseAction)
                 .addAction(android.R.drawable.ic_media_next, "next", playbackAction(2))
+                .addAction(android.R.drawable.ic_menu_close_clear_cancel, "close", playbackAction(4))
         (getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).notify(NOTIFICATION_ID, notificationBuilder.build())
     }
 
@@ -264,6 +268,10 @@ class KAudioMusicService : Service(),
             3 -> {
                 playbackAction.action = ACTION_PREVIOUS
                 PendingIntent.getService(this , actionNumber, playbackAction, 0)
+            }
+            4 -> {
+                playbackAction.action = ACTION_CLOSE
+                PendingIntent.getService(this, actionNumber, playbackAction, 0)
             }
             else -> null
         }
@@ -385,6 +393,7 @@ class KAudioMusicService : Service(),
             addAction(MainActivity.Broadcast_NEXT_AUDIO)
             addAction(MainActivity.Broadcast_PREV_AUDIO)
             addAction(MainActivity.Broadcast_SEEK_TO_AUDIO)
+            addAction(MainActivity.Broadcast_DESTROY_SERVICE)
         }
         registerReceiver(playNewAudio, filter)
     }
