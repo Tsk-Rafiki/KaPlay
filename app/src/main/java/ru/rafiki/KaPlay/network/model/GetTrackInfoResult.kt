@@ -6,59 +6,59 @@ import com.google.gson.annotations.SerializedName
 /**
  * Created by denis.sakovich on 04.12.2017.
  */
-class Album {
+data class Album(
     @SerializedName("artist")
     @Expose
-    private val artist: String? = null
+    val artist: String? = null,
     @SerializedName("title")
     @Expose
-    private val title: String? = null
+    val title: String? = null,
     @SerializedName("mbid")
     @Expose
-    private val mbid: String? = null
+    val mbid: String? = null,
     @SerializedName("url")
     @Expose
-    private val url: String? = null
+    val url: String? = null,
     @SerializedName("image")
     @Expose
-    private val image: List<Image>? = null
+    val image: List<Image>? = null,
     @SerializedName("@attr")
     @Expose
-    private val attr: SimilarAttr? = null
-}
+    val attr: SimilarAttr? = null
+)
 
-class Artist {
+data class Artist (
     @SerializedName("name")
     @Expose
-    var name: String? = null
+    var name: String? = null,
     @SerializedName("mbid")
     @Expose
-    var mbid: String? = null
+    var mbid: String? = null,
     @SerializedName("url")
     @Expose
     var url: String? = null
-}
+    )
 
-class Attr {
+data class Attr (
     @SerializedName("position")
     @Expose
     var position: String? = null
-}
+)
 
-class GetTrackInfoResult {
+data class GetTrackInfoResult (
     @SerializedName("track")
     @Expose
     var track: Track? = null
-}
+)
 
-class Image {
+data class Image (
     @SerializedName("#text")
     @Expose
-    var text: String? = null
+    var text: String? = null,
     @SerializedName("size")
     @Expose
     var size: String? = null
-}
+)
 
 class Streamable {
     @SerializedName("#text")
@@ -69,65 +69,65 @@ class Streamable {
     var fulltrack: String? = null
 }
 
-class Tag {
+data class Tag (
     @SerializedName("name")
     @Expose
-    var name: String? = null
+    var name: String? = null,
     @SerializedName("url")
     @Expose
     var url: String? = null
-}
+)
 
-class Toptags {
+data class Toptags (
     @SerializedName("tag")
     @Expose
     var tag: List<Tag>? = null
-}
+)
 
-class Track {
+data class Track (
     @SerializedName("name")
     @Expose
-    var name: String? = null
+    var name: String? = null,
     @SerializedName("mbid")
     @Expose
-    var mbid: String? = null
+    var mbid: String? = null,
     @SerializedName("url")
     @Expose
-    var url: String? = null
+    var url: String? = null,
     @SerializedName("duration")
     @Expose
-    var duration: String? = null
+    var duration: String? = null,
     @SerializedName("streamable")
     @Expose
-    var streamable: Streamable? = null
+    var streamable: Streamable? = null,
     @SerializedName("listeners")
     @Expose
-    var listeners: String? = null
+    var listeners: String? = null,
     @SerializedName("playcount")
     @Expose
-    var playcount: String? = null
+    var playcount: String? = null,
     @SerializedName("artist")
     @Expose
-    var artist: Artist? = null
+    var artist: Artist? = null,
     @SerializedName("album")
     @Expose
-    var album: Album? = null
+    var album: Album? = null,
     @SerializedName("toptags")
     @Expose
-    var toptags: Toptags? = null
+    var toptags: Toptags? = null,
     @SerializedName("wiki")
     @Expose
     var wiki: Wiki? = null
-}
+)
 
-class Wiki {
+data class Wiki (
     @SerializedName("published")
     @Expose
-    var published: String? = null
+    var published: String? = null,
     @SerializedName("summary")
     @Expose
-    var summary: String? = null
+    var summary: String? = null,
     @SerializedName("content")
     @Expose
     var content: String? = null
-}
+)

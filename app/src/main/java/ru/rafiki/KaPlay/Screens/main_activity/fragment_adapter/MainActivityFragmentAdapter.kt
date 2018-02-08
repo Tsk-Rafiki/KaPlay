@@ -1,5 +1,6 @@
 package ru.rafiki.KaPlay.Screens.main_activity.fragment_adapter
 
+import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentPagerAdapter
@@ -13,15 +14,21 @@ import ru.rafiki.KaPlay.Screens.main_activity.fragments.SettingsFragment.Setting
  */
 class SectionsPagerAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {
 
+    fun setParametersToPlayerFragment(value: Int) {
+        val bundle = Bundle()
+        bundle.putInt("filesCount", value)
+        getItem(MainActivity.FragmentType.player.ordinal).arguments = bundle
+    }
+    
     override fun getItem(position: Int): Fragment {
         return when(position) {
-            MainActivity.fragmentType.player.ordinal -> PlayerFragment.newInstance()
-            MainActivity.fragmentType.playlist.ordinal -> PlayListFragment.newInstance()
+            MainActivity.FragmentType.player.ordinal -> PlayerFragment.newInstance()
+            MainActivity.FragmentType.playlist.ordinal -> PlayListFragment.newInstance()
             else -> SettingsFragment.newInstance()
         }
     }
 
     override fun getCount(): Int {
-        return MainActivity.fragmentType.values().size
+        return MainActivity.FragmentType.values().size
     }
 }

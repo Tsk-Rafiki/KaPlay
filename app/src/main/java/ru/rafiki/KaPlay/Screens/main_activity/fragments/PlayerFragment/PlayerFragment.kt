@@ -1,9 +1,6 @@
 package ru.rafiki.KaPlay.Screens.main_activity.fragments.PlayerFragment
 
-import android.content.ComponentName
-import android.content.Context
-import android.content.Intent
-import android.content.ServiceConnection
+import android.content.*
 import android.os.Bundle
 import android.os.IBinder
 import android.support.v4.app.Fragment
@@ -21,6 +18,8 @@ import ru.rafiki.KaPlay.Screens.main_activity.MainActivity
 import ru.rafiki.KaPlay.repository.StorageUtil
 import ru.rafiki.KaPlay.services.kaudio_media_service.AudioRepository
 import ru.rafiki.KaPlay.services.kaudio_media_service.KAudioMusicService
+import com.squareup.picasso.Picasso
+import kotlinx.android.synthetic.main.fragment_player.*
 
 /**
  * Created by denis.sakovich on 04.12.2017.
@@ -31,7 +30,9 @@ class PlayerFragment : Fragment(), View.OnClickListener{
     lateinit var player: KAudioMusicService
     var isPlaying: Boolean = false
 
+    private var playingInfoReceiver: BroadcastReceiver? = null
     var isServiceBound = false
+    var isMusicFilesExist : Boolean = false
     lateinit private var serviceConnection: ServiceConnection
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -49,12 +50,12 @@ class PlayerFragment : Fragment(), View.OnClickListener{
                         , { error ->
                     error.printStackTrace()
                 })
-
         rootView.button_next.setOnClickListener(this)
         rootView.button_stop.setOnClickListener(this)
         rootView.button_play.setOnClickListener(this)
         rootView.button_prev.setOnClickListener(this)
 
+        isMusicFilesExist = (activity as MainActivity).isMusicFilesExists()
         serviceConnection = object : ServiceConnection {
             override fun onServiceDisconnected(name: ComponentName?) {
                 isServiceBound = false
@@ -67,6 +68,32 @@ class PlayerFragment : Fragment(), View.OnClickListener{
                 Toast.makeText(this@PlayerFragment.context, "Service bound", Toast.LENGTH_SHORT).show()
             }
         }
+        playingInfoReceiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context, intent: Intent) {
+                val artist: String? = intent.getStringExtra(MainActivity.KEY_ARTIST)
+                val album: String? = intent.getStringExtra(MainActivity.KEY_ALBUM)
+                if (artist != null && album != null)
+                lastFmApi.getTrackInfo("track.getInfo", api_key, artist, album)
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribeOn(Schedulers.io())
+                        .subscribe({ result ->
+                            val imagePath = result.track?.album?.image?.get(2)?.text
+                            if (imagePath != null) {
+                                Picasso.with(context)
+                                        .load(imagePath)
+                                        .into(artist_image)
+                            }
+                        }
+                                , { error ->
+                            error.printStackTrace()
+                        })
+
+            }
+        }
+        val intentFilter = IntentFilter()
+        intentFilter.addAction(MainActivity.Broadcast_IMAGE_PATH)
+        activity.registerReceiver(playingInfoReceiver, intentFilter)
+
         return rootView
     }
 
@@ -74,29 +101,26 @@ class PlayerFragment : Fragment(), View.OnClickListener{
         if (v != null)
         when (v.id) {
             R.id.button_next -> ButtonNextClicked()
-            R.id.button_stop -> ButtonPauseClicked()
+            R.id.button_stop -> ButtonStopClicked()
             R.id.button_play -> ButtonPlayClicked()
             R.id.button_prev -> ButtonPrevClicked()
         }
-
     }
 
     private fun ButtonNextClicked() {
-        val broadcastIntent = Intent(MainActivity.Broadcast_NEXT_AUDIO)
-        activity.sendBroadcast(broadcastIntent)
-    }
-
-    private fun ButtonPauseClicked() {
-        isPlaying = if (isPlaying) {
-            playAudio(0)
-            true
-        } else {
-            stopAudio()
-            false
+        if (isMusicFilesExist) {
+            val broadcastIntent = Intent(MainActivity.Broadcast_NEXT_AUDIO)
+            activity.sendBroadcast(broadcastIntent)
         }
     }
 
+    private fun ButtonStopClicked() {
+        if (!isMusicFilesExist) return
+        stopAudio()
+    }
+
     private fun ButtonPlayClicked() {
+        if (!isMusicFilesExist) return
         isPlaying = if (!isPlaying) {
             playAudio(0)
             true
@@ -107,6 +131,7 @@ class PlayerFragment : Fragment(), View.OnClickListener{
     }
 
     private fun ButtonPrevClicked() {
+    if (!isMusicFilesExist) return
         val broadcastIntent = Intent(MainActivity.Broadcast_PREV_AUDIO)
         activity.sendBroadcast(broadcastIntent)
     }
@@ -118,6 +143,7 @@ class PlayerFragment : Fragment(), View.OnClickListener{
     }
 
     private fun playAudio(audioIndex: Int) {
+        if (!isMusicFilesExist) return
         if (!isServiceBound) {
             AudioRepository.storeDataAndIndex(context, audioIndex)
             val playerIntent = Intent(activity.applicationContext, KAudioMusicService::class.java)
@@ -132,6 +158,7 @@ class PlayerFragment : Fragment(), View.OnClickListener{
     }
 
     private fun stopAudio() {
+        if (!isMusicFilesExist) return
         val broadcastIntent = Intent(MainActivity.Broadcast_STOP_AUDIO)
         activity.sendBroadcast(broadcastIntent)
     }

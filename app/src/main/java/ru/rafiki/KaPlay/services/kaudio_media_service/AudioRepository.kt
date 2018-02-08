@@ -39,6 +39,10 @@ object AudioRepository{
         return true
     }
 
+    fun getFilesCount() : Int {
+        return audioList.size
+    }
+
     fun storeDataAndIndex(context: Context, audioIndex: Int) {
         val storage = StorageUtil(context)
         storage.storeAudio(audioList)

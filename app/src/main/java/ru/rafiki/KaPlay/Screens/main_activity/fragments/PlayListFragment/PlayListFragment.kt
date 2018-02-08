@@ -9,7 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
-import kotlinx.android.synthetic.main.playlist_fragment.view.*
+import kotlinx.android.synthetic.main.fragment_playlist.view.*
 import ru.rafiki.KaPlay.R
 import ru.rafiki.KaPlay.services.kaudio_media_service.AudioRepository
 
@@ -25,7 +25,7 @@ class PlayListFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         Log.d("PlayListFragment", "OnCreateView")
-        val rootView = inflater.inflate(R.layout.playlist_fragment, container, false)
+        val rootView = inflater.inflate(R.layout.fragment_playlist, container, false)
         adapter = PlayListAdapter(AudioRepository.audioList)
         recycler = rootView.playListRecyclerView
         recycler.layoutManager = LinearLayoutManager(this.context, LinearLayout.VERTICAL, false)

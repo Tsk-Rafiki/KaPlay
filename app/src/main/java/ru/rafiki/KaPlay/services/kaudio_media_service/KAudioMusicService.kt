@@ -80,18 +80,22 @@ class KAudioMusicService : Service(),
 
         playNewAudio = object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
-                audioIndex = StorageUtil(applicationContext).loadAudioIndex()
-                if (audioIndex != -1 && audioIndex < audioList.size) {
-                    activeAudio = audioList[audioIndex]
-                } else {
-                    stopSelf()
-                }
-
-                stopMedia()
-                mediaPlayer.reset()
-                initMediaPlayer()
+                if (intent != null)
+                    handleIncomingIntent(intent)
                 updateMetaData()
                 buildNotification(PlaybackStatus.PLAYING)
+//                audioIndex = StorageUtil(applicationContext).loadAudioIndex()
+//                if (audioIndex != -1 && audioIndex < audioList.size) {
+//                    activeAudio = audioList[audioIndex]
+//                } else {
+//                    stopSelf()
+//                }
+//
+//                stopMedia()
+//                mediaPlayer.reset()
+//                initMediaPlayer()
+//                updateMetaData()
+//                buildNotification(PlaybackStatus.PLAYING)
 
             }
         }
@@ -292,8 +296,9 @@ class KAudioMusicService : Service(),
     override fun onBind(intent: Intent?) = iBinder
 
     override fun onCompletion(mp: MediaPlayer?) {
-        stopMedia()
-        stopSelf()
+        skipToNext()
+        //stopMedia()
+        //stopSelf()
     }
 
     override fun onPrepared(mp: MediaPlayer?) {
@@ -385,6 +390,19 @@ class KAudioMusicService : Service(),
         return super.onStartCommand(intent, flags, startId)
     }
 
+    fun handleIncomingIntent(intent: Intent) {
+        val value = intent.action
+        when(value) {
+            MainActivity.Broadcast_PLAY_AUDIO -> playMedia()
+            MainActivity.Broadcast_STOP_AUDIO -> stopMedia()
+            MainActivity.Broadcast_NEXT_AUDIO -> skipToNext()
+            MainActivity.Broadcast_PREV_AUDIO -> skipToPrevious()
+            MainActivity.Broadcast_SEEK_TO_AUDIO -> stopMedia()
+            MainActivity.Broadcast_DESTROY_SERVICE -> onDestroy()
+
+        }
+    }
+
     private fun registerLocalReceiver() {
         val filter = IntentFilter()
         with(filter) {
@@ -443,7 +461,15 @@ class KAudioMusicService : Service(),
     }
 
     private fun playMedia() {
-        if(!mediaPlayer.isPlaying) mediaPlayer.start()
+        if(!mediaPlayer.isPlaying) {
+            mediaPlayer.start()
+            val intent = Intent(MainActivity.Broadcast_IMAGE_PATH)
+            val artist = audioList[audioIndex].artist
+            val album = audioList[audioIndex].album
+            intent.putExtra(MainActivity.KEY_ALBUM, album)
+            intent.putExtra(MainActivity.KEY_ARTIST, artist)
+            sendBroadcast(intent)
+        }
     }
 
     private fun stopMedia() {

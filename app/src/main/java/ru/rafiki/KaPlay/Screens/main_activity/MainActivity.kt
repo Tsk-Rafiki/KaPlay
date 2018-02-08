@@ -3,19 +3,14 @@ package ru.rafiki.KaPlay.Screens.main_activity
 import android.Manifest
 import android.content.*
 import android.content.pm.PackageManager
-import android.database.Cursor
-import android.net.Uri
 import android.os.Build
-import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 
 import android.os.Bundle
 import android.os.IBinder
-import android.provider.MediaStore
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
 import android.widget.Toast
 
 import kotlinx.android.synthetic.main.activity_main.*
@@ -33,32 +28,30 @@ class MainActivity : AppCompatActivity() {
         val Broadcast_PREV_AUDIO: String = "ru.sdn.audiotestkotlin.PrevAudio"
         val Broadcast_SEEK_TO_AUDIO: String = "ru.sdn.audiotestkotlin.SeekToAudio"
         val Broadcast_DESTROY_SERVICE: String = "ru.sdn.audiotestkotlin.SeekToAudio"
+        val Broadcast_IMAGE_PATH: String = "ru.sdn.audiotestkotline.ImagePath"
+        val KEY_ARTIST: String = "artist"
+        val KEY_ALBUM: String = "album"
     }
 
     lateinit var player: KAudioMusicService
     lateinit var audioRepository: AudioRepository
 
     var isServiceBound = false
-    var isPlayerDisabled = false
+    var isMusicFilesExist = true
     lateinit private var serviceConnection: ServiceConnection
 
-    enum class fragmentType { player, playlist, settings}
+    enum class FragmentType { player, playlist, settings}
 
     private var mSectionsPagerAdapter: SectionsPagerAdapter? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        setSupportActionBar(toolbar)
+        checkReadExternalPermissions()
         mSectionsPagerAdapter = SectionsPagerAdapter(supportFragmentManager)
-
+        mSectionsPagerAdapter?.setParametersToPlayerFragment(AudioRepository.getFilesCount())
         container.adapter = mSectionsPagerAdapter
 
-//        fab.setOnClickListener { view ->
-//            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                    .setAction("Action", null).show()
-//        }
-        checkReadExternalPermissions()
         serviceConnection = object : ServiceConnection {
             override fun onServiceDisconnected(name: ComponentName?) {
                 isServiceBound = false
@@ -71,10 +64,7 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(this@MainActivity, "Service bound", Toast.LENGTH_SHORT).show()
             }
         }
-//        audioRepository = AudioRepository
-//        audioRepository.loadAudio(applicationContext)
     }
-
 
     private fun checkReadExternalPermissions() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -88,7 +78,7 @@ class MainActivity : AppCompatActivity() {
             } else {
                 audioRepository = AudioRepository
                 if (!audioRepository.loadAudio(applicationContext)) {
-                    isPlayerDisabled = true
+                    isMusicFilesExist = false
                     Toast.makeText(this, "Music not found!", Toast.LENGTH_SHORT).show()
                     Log.d("myLog", "Music not found!")
                 }
@@ -103,28 +93,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        menuInflater.inflate(R.menu.menu_main, menu)
-        return true
+    fun isMusicFilesExists(): Boolean {
+        return isMusicFilesExist
     }
-
-    override fun onDestroy() {
-        super.onDestroy()
-
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        val id = item.itemId
-
-        if (id == R.id.action_settings) {
-            return true
-        }
-
-        return super.onOptionsItemSelected(item)
-    }
-
 }

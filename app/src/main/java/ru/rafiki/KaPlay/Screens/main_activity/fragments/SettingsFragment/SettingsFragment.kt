@@ -6,7 +6,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import kotlinx.android.synthetic.main.fragment_player.view.*
 import ru.rafiki.KaPlay.R
 
 /**
@@ -17,7 +16,7 @@ class SettingsFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         Log.d("SettingsFragment", "OnCreateView")
-        val rootView = inflater.inflate(R.layout.playlist_fragment, container, false)
+        val rootView = inflater.inflate(R.layout.fragment_playlist, container, false)
         return rootView
     }
 
